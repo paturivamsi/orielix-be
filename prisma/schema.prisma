@@ -1,0 +1,175 @@
+generator client {
+  provider = "prisma-client-js"
+  // output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id String @id 
+  username String? @unique
+  firstName String?
+  lastName String?
+  preferredName String?
+  email String @unique
+  password String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  address String?
+  phone String?
+  auraPoints Int
+  zinPinCode String?
+  dob String?
+  userType String @default("customer") @map("userType") @db.VarChar(255)
+  isVerified Boolean @default(false)
+  isActive Boolean @default(true)
+  isDeleted Boolean @default(false)
+  about String?
+  profileImage String?
+  institution String? @default("---")
+  fieldOfStudy String?
+  fieldDescription String?
+  profilePercentage Int @default(0)
+  interests String[]
+  userSessions String[]
+  presentedEvents event[] @relation("EventPresenters")
+  events event[] @relation("EventJoinedUsers")
+  sessions Session[] @relation("SessionJoinedUsers")
+  presentedSessions Session[] @relation("SessionPresenters")
+  designation String?
+  isJoinedWithGoogle Boolean @default(false)
+  portfolioLink String?
+  githubLink String?
+  linkedinLink String?
+  twitterLink String?
+  facebookLink String?
+  instagramLink String?
+  youtubeLink String?
+  country String? @default("India")
+  state String? @default("Rajasthan")
+  city String? @default("Jaipur")
+  stateRank Int?
+  countryRank Int?
+  institutionRank Int?
+  Notifications Notifications[]
+  profileImageId String?
+
+  calendar calendar[]
+}
+
+model event {
+  id String @id
+  eventName String
+  eventDescription String
+  eventDate String
+  eventTime String
+  eventLocation String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  eventImage String?
+  createdBy String
+  status String @default("upcoming")
+  isDeleted Boolean @default(false)
+  duration String?
+  eventType String?
+  externalLink String?
+  presenterId String?
+  isActive Boolean? @default(true)
+  presenter User? @relation("EventPresenters", fields: [presenterId], references: [id])
+  joinedUsers User[] @relation("EventJoinedUsers")
+  withbreaks Boolean @default(true)
+  calendar calendar[]
+}
+
+model Notifications {
+  type String
+  id String @id
+  title String
+  description String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  userId String?
+  user User? @relation(fields: [userId], references: [id])
+  isRead Boolean @default(false)
+  isDeleted Boolean @default(false)
+  status String @default("unread")
+}
+
+
+model Session{
+  id String @id
+  createdAt DateTime @default(now())
+  image String?
+  updatedAt DateTime @updatedAt
+  createdBy String
+  status String @default("upcoming")
+  isDeleted Boolean? @default(false)
+  name String
+  description String
+  externalLink String?
+  type String?
+  duration String?
+  date String
+  time String
+  location String?
+  isActive Boolean? @default(true)
+  joinedUsers User[] @relation("SessionJoinedUsers")
+  presenterId String?
+  presenter User? @relation("SessionPresenters", fields: [presenterId], references: [id])
+  category String?
+  calendar calendar[]
+}
+
+model calendar {
+  id String @id
+  userId String
+  eventId String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  isDeleted Boolean @default(false)
+  user User @relation(fields: [userId], references: [id])
+  event event? @relation(fields: [eventId], references: [id])
+  sessionId String?
+  session Session? @relation(fields: [sessionId], references: [id])
+}
+
+model otp {
+  id String @id
+  email String
+  lastOtp String
+}
+
+
+model Interest {
+  id String @id
+  name String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  description String?
+  createdBy String
+  isActive Boolean @default(true)
+  isDeleted Boolean @default(false)
+}
+
+model Role {
+  id String @id
+  name String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  description String?
+  createdBy String
+  isActive Boolean @default(true)
+  isDeleted Boolean @default(false)
+}
+
+enum UserType {
+  admin
+  customer
+  ta
+  superadmin
+  creator
+  presenter
+}
